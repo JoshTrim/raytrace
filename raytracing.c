@@ -31,6 +31,17 @@ struct Color {
 #define GREEN (struct Color){0, 255, 0, 0}
 #define BLUE (struct Color){0, 0, 255, 0}
 
+struct Ray {
+  double x_start, y_start;
+  double x_end, y_end;
+  double angle;
+};
+
+void DrawRay(struct Ray r, struct Color color, SDL_Renderer **renderer) {
+  SDL_SetRenderDrawColor(*renderer, color.r, color.g, color.b, color.a);
+  SDL_RenderDrawLine(*renderer, r.x_start, r.y_start, r.x_end, r.y_end);
+}
+
 void FillCircle(SDL_Renderer *renderer, struct Circle circle,
                 struct Color color) {
 
@@ -93,6 +104,21 @@ int initsdl(SDL_Window **window, SDL_Renderer **renderer) {
 //   FillCircle(*renderer, circle, BLUE);
 // }
 
+void rays(struct Circle circle, struct Color color, int n, int length,
+          SDL_Renderer **renderer) {
+  double angle_step = (2 * M_PI) / n;
+  for (int i = 0; i < n; i++) {
+    double angle = i * angle_step;
+    struct Ray ray;
+    ray.x_start = circle.x + (circle.r * cos(angle));
+    ray.y_start = circle.y + (circle.r * sin(angle));
+    ray.x_end = circle.x + (length * cos(angle));
+    ray.y_end = circle.y + (length * sin(angle));
+
+    DrawRay(ray, color, renderer);
+  }
+}
+
 int main(void) {
 
   int DEBUG = checkenvbool("RT_DEBUG");
@@ -108,7 +134,10 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
-  struct Circle circle = {WIDTH / 2, HEIGHT / 2, 50};
+  // circles
+  struct Circle circle = {200, 200, 80};
+  struct Circle shadow = {650, 300, 120};
+
   while (running) {
     while (SDL_PollEvent(&e)) {
 
@@ -126,7 +155,9 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
+    rays(circle, RED, 360, 1000, &renderer);
     FillCircle(renderer, circle, BLUE);
+    FillCircle(renderer, shadow, GREEN);
     // draw(&renderer);
 
     SDL_RenderPresent(renderer);
