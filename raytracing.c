@@ -4,6 +4,7 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,40 @@
 #define HEIGHT 600
 #define DELAY 5000
 #define COLOR_WHITE 0xFFFFFF
+
+struct Circle {
+  double x;
+  double y;
+  double r;
+};
+
+struct Color {
+  int r;
+  int g;
+  int b;
+  int a;
+};
+
+#define RED (struct Color){255, 0, 0, 0}
+#define GREEN (struct Color){0, 255, 0, 0}
+#define BLUE (struct Color){0, 0, 255, 0}
+
+void FillCircle(SDL_Renderer *renderer, struct Circle circle,
+                struct Color color) {
+
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+
+  double radius_squared = pow(circle.r, 2);
+  for (double x = circle.x - circle.r; x <= circle.x + circle.r; x++) {
+    for (double y = circle.y - circle.r; y <= circle.y + circle.r; y++) {
+      double distance_squared = pow(x - circle.x, 2) + pow(y - circle.y, 2);
+      if (distance_squared <= radius_squared) {
+        SDL_Rect pixel = (SDL_Rect){x, y, 1, 1};
+        SDL_RenderFillRect(renderer, &pixel);
+      }
+    }
+  }
+}
 
 int checkenvbool(char *name) {
   char *env_p = getenv(name);
@@ -51,6 +86,13 @@ int initsdl(SDL_Window **window, SDL_Renderer **renderer) {
   return 0;
 }
 
+void draw(SDL_Renderer **renderer) {
+
+  // draw
+  struct Circle circle = {WIDTH / 2, HEIGHT / 2, 50};
+  FillCircle(*renderer, circle, BLUE);
+}
+
 int main(void) {
 
   int DEBUG = checkenvbool("RT_DEBUG");
@@ -66,11 +108,6 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
-  SDL_Rect rect = (SDL_Rect){200, 200, 100, 100};
-
-  int xi = 0;
-  int yi = 0;
-
   while (running) {
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
@@ -82,18 +119,9 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // drawing loop
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    draw(&renderer);
+
     SDL_RenderPresent(renderer);
-
-    xi += 1;
-    yi += 1;
-
-    rect.x = xi;
-    rect.y = yi;
-
-    printf("x: %d, y: %d", xi, yi);
 
     SDL_Delay(16);
   }
