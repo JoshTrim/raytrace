@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +10,7 @@
 #define WIDTH 900
 #define HEIGHT 600
 #define DELAY 5000
+#define COLOR_WHITE 0xFFFFFF
 
 int checkenvbool(char *name) {
   char *env_p = getenv(name);
@@ -63,15 +65,23 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
+  SDL_Rect rect = (SDL_Rect){200, 200, 100, 100};
+
   while (running) {
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
         running = 0;
       }
     }
-
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    // clear screen
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+
+    SDL_RenderClear(renderer);
+
+    // drawing loop
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_RenderFillRect(renderer, &rect);
     SDL_RenderPresent(renderer);
   }
 
