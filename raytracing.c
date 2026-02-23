@@ -2,6 +2,7 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
+#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,22 +68,34 @@ int main(void) {
 
   SDL_Rect rect = (SDL_Rect){200, 200, 100, 100};
 
+  int xi = 0;
+  int yi = 0;
+
   while (running) {
     while (SDL_PollEvent(&e)) {
       if (e.type == SDL_QUIT) {
         running = 0;
       }
     }
+
     // clear screen
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-
     SDL_RenderClear(renderer);
 
     // drawing loop
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderPresent(renderer);
+
+    xi += 1;
+    yi += 1;
+
+    rect.x = xi;
+    rect.y = yi;
+
+    printf("x: %d, y: %d", xi, yi);
+
+    SDL_Delay(16);
   }
 
   SDL_DestroyRenderer(renderer);
