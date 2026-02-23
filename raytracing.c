@@ -86,12 +86,12 @@ int initsdl(SDL_Window **window, SDL_Renderer **renderer) {
   return 0;
 }
 
-void draw(SDL_Renderer **renderer) {
-
-  // draw
-  struct Circle circle = {WIDTH / 2, HEIGHT / 2, 50};
-  FillCircle(*renderer, circle, BLUE);
-}
+// void draw(SDL_Renderer **renderer) {
+//
+//   // draw
+//   struct Circle circle = {WIDTH / 2, HEIGHT / 2, 50};
+//   FillCircle(*renderer, circle, BLUE);
+// }
 
 int main(void) {
 
@@ -108,10 +108,17 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
+  struct Circle circle = {WIDTH / 2, HEIGHT / 2, 50};
   while (running) {
     while (SDL_PollEvent(&e)) {
+
       if (e.type == SDL_QUIT) {
         running = 0;
+      }
+
+      if (e.type == SDL_MOUSEMOTION && e.motion.state != 0) {
+        circle.x = e.motion.x;
+        circle.y = e.motion.y;
       }
     }
 
@@ -119,7 +126,8 @@ int main(void) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    draw(&renderer);
+    FillCircle(renderer, circle, BLUE);
+    // draw(&renderer);
 
     SDL_RenderPresent(renderer);
 
